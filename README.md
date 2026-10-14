@@ -25,12 +25,28 @@ RaceDay.Tests/   Unit tests
 ```
 
 ## Getting started
-TODO: fill in after Step 2.
 
-1. Clone the repo.
-2. Update the connection string in `appsettings.json`.
-3. Run `Update-Database` in the Package Manager Console.
-4. Press F5 and open the Swagger page.
+### Prerequisites
+- Visual Studio 2022 with the ASP.NET and web development workload
+- .NET 8 SDK
+- SQL Server (SQL Server Express) and SQL Server Management Studio
+
+### Setup
+1. Clone the repo and open `RaceDay.API.sln` in Visual Studio.
+2. Open `RaceDay.API/appsettings.json` and update the connection string to match your SQL Server instance:
+```
+   "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=RaceDayApiDb;Trusted_Connection=True;TrustServerCertificate=True;"
+```
+   I developed this on `LabVM2049939\SQLEXPRESS`. On another machine this will be different, for example `localhost\SQLEXPRESS`. Remember to use a double backslash (`\\`) in the JSON file.
+3. Open **Tools > NuGet Package Manager > Package Manager Console** and run:
+```
+   Update-Database
+```
+   This applies the `InitialCreate` migration and creates the database with all 11 tables (Users, Organisers, Participants, Events, Categories, Enrolments, Payments, Results, Sponsors, EventSponsors, WeatherLogs).
+4. Press **F5** to run the API. Swagger opens at `https://localhost:7286/swagger`. The port number may differ on your machine.
+
+### Database
+The database is created by Entity Framework Core migrations (code first). The migration files are in `RaceDay.API/Migrations`. The Part 1 SQL scripts were written for MySQL and are not used in this part.
 
 ## API endpoints
 The API follows the endpoint plan from Part 1 (`docs/api-endpoint-plan.md` in the Part 1 repo).
