@@ -135,3 +135,6 @@ Payments	POST must send an amount equal to the category’s entry fee (otherwise 4
 Results	Status must be Finished, DNF or DNS. A Finished result needs a finish time and a position. A DNF or DNS result must not have either (400)	Keeps the leaderboard consistent
 Results	Capturing or correcting a result returns 409 if the position is already taken in that category, and capturing one for a cancelled enrolment also returns 409	Two people cannot share a position
 Results	The leaderboard lists finishers by position first, then DNF and DNS	The plan only says “ordered by position”
+
+Sponsors	Linking a sponsor to an event returns 404 if the sponsor doesn’t exist, and GET /api/events/{eventId}/sponsors returns 404 if the event doesn’t exist	The plan listed only the 403 and 409 cases for these
+Sponsors	sponsorshipTier is required when linking, and contactEmail and logoUrl must be a valid email and URL	Basic input validation
