@@ -124,7 +124,26 @@ The Part 1 ERD and endpoint plan disagree in a few places. The entities follow t
 
 ## Swagger
 Run the API and open `/swagger`. Every endpoint shows its purpose, who may call it, the data it expects and the responses it can return. Click **Authorize** and paste the token from `POST /api/auth/login` to test the protected endpoints.
+
+## Running the tests
+The tests are in `RaceDay.Tests` (xUnit). They start the real API in memory with `WebApplicationFactory` and use an in-memory database, so no SQL Server is needed.
+
+- **Visual Studio:** Test > Run All Tests
+- **Command line:** `dotnet test`
+
+| Area | What is tested |
+|---|---|
+| Registration and login | Success for both roles; invalid role, email and password; duplicate email; wrong password; the password is stored hashed; the token works on protected endpoints |
+| Event management | Organisers create, update and delete their own events; invalid event type, name and date are rejected; another Organiser gets 403; events with enrolments cannot be deleted |
+| Categories | Create with route details, ownership checks, participant limit and delete rules |
+| Role access | Every protected endpoint returns 401 without a token; Organiser-only and Participant-only endpoints return 403 for the wrong role; public endpoints stay open; a forged token is rejected |
+| Event enrolments | A Participant can enrol and the participant, event, category, bib number and pending payment are recorded; duplicates and full categories return 409; cancelling and re-enrolling |
+| Payments and results | Paying the exact fee, refunds, capturing and correcting results, and the public leaderboard |
+
+The in-memory database does not enforce SQL Server constraints such as unique indexes, so the rules the tests check are the ones the controllers enforce.
+
 Any further deviations will be listed here.
+
 
 Area	Change	Reason
 Events	DELETE /api/events/{id} returns 409 Conflict if the event has enrolments	Enrolments use a Restrict delete rule, so removing the event would otherwise fail with a database error
