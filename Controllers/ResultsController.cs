@@ -56,7 +56,49 @@ public class ResultsController : ControllerBase
             r.Enrolment.CategoryId == categoryId &&
             r.Position == position &&
             r.ResultId != ignoreResultId);
+    // >>> CaptureResult
+    /// <summary>Captures the result for an enrolment after the event.</summary>
+    /// <remarks>
+    /// Access: the Organiser who owns the event.
+    /// Body: status (Finished, DNF or DNS), finishTime (hh:mm:ss) and position.
+    /// A Finished result needs a finish time and a position. A DNF or DNS result must have neither.
+    /// </remarks>
+    /// <param name="enrolmentId">The enrolment id.</param>
+    /// <response code="201">Result captured.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Enrolment not found.</response>
+    /// <response code="409">A result already exists, the position is taken, or the enrolment is cancelled.</response>
+    [ProducesResponseType(typeof(ResultResponse), StatusCodes.Status201Created)]
 
+    // >>> CorrectResult
+    /// <summary>Corrects a result that was captured earlier.</summary>
+    /// <remarks>Access: the Organiser who owns the event. Same body and rules as capturing a result.</remarks>
+    /// <param name="id">The result id.</param>
+    /// <response code="200">The corrected result.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Result not found.</response>
+    /// <response code="409">The position is already taken in this category.</response>
+    [ProducesResponseType(typeof(ResultResponse), StatusCodes.Status200OK)]
+
+    // >>> GetMyResults
+    /// <summary>Returns the logged-in Participant's own result history.</summary>
+    /// <remarks>Access: Participant. No body. Newest event first.</remarks>
+    /// <response code="200">The participant's results across all events.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Only Participants have results.</response>
+    [ProducesResponseType(typeof(IEnumerable<ResultResponse>), StatusCodes.Status200OK)]
+
+    // >>> GetCategoryResults
+    /// <summary>Returns the leaderboard for a category.</summary>
+    /// <remarks>Public, no token needed. Finishers are ordered by position, followed by DNF and DNS.</remarks>
+    /// <param name="categoryId">The category id.</param>
+    /// <response code="200">The results for the category.</response>
+    /// <response code="404">Category not found.</response>
+    [ProducesResponseType(typeof(IEnumerable<ResultResponse>), StatusCodes.Status200OK)]
     [HttpPost("api/enrolments/{enrolmentId:int}/result")]
     [Authorize(Roles = Roles.Organiser)]
     public async Task<IActionResult> CaptureResult(int enrolmentId, ResultRequest request)
