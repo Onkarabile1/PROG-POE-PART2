@@ -19,7 +19,35 @@ public class EventSponsorsController : ControllerBase
     {
         _db = db;
     }
+    // >>> GetEventSponsors
+    /// <summary>Lists the sponsors linked to an event, with their tiers.</summary>
+    /// <remarks>Public, no token needed.</remarks>
+    /// <param name="eventId">The event id.</param>
+    /// <response code="200">The event's sponsors.</response>
+    /// <response code="404">Event not found.</response>
+    [ProducesResponseType(typeof(IEnumerable<EventSponsorResponse>), StatusCodes.Status200OK)]
 
+    // >>> LinkSponsor
+    /// <summary>Links an existing sponsor to an event with a sponsorship tier.</summary>
+    /// <remarks>Access: the Organiser who owns the event. Body: sponsorId and sponsorshipTier (for example Gold).</remarks>
+    /// <param name="eventId">The event id.</param>
+    /// <response code="201">Sponsor linked to the event.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Event or sponsor not found.</response>
+    /// <response code="409">The sponsor is already linked to this event.</response>
+    [ProducesResponseType(typeof(EventSponsorResponse), StatusCodes.Status201Created)]
+
+    // >>> UnlinkSponsor
+    /// <summary>Removes a sponsor from an event.</summary>
+    /// <remarks>Access: the Organiser who owns the event. No body. The sponsor record itself is kept.</remarks>
+    /// <param name="eventId">The event id.</param>
+    /// <param name="sponsorId">The sponsor id.</param>
+    /// <response code="200">Sponsor removed from the event.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Event not found, or the sponsor is not linked to it.</response>
     // Public.
     [HttpGet]
     public async Task<IActionResult> GetEventSponsors(int eventId)
