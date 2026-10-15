@@ -120,3 +120,8 @@ The Part 1 ERD and endpoint plan disagree in a few places. The entities follow t
 | Database | SQL Server with EF Core migrations instead of the MySQL scripts from Part 1 | Part 2 brief requires SQL Server |
 
 Any further deviations will be listed here.
+
+Area	Change	Reason
+Events	DELETE /api/events/{id} returns 409 Conflict if the event has enrolments	Enrolments use a Restrict delete rule, so removing the event would otherwise fail with a database error
+Events	GET /api/events?date= matches that exact day. Without it, only upcoming events are listed	The plan didn’t say how the date filter works
+Categories	PUT /api/categories/{id} returns 409 Conflict if the new participant limit is below the number already enrolled	Prevents a category being over-full
