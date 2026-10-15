@@ -119,6 +119,9 @@ The Part 1 ERD and endpoint plan disagree in a few places. The entities follow t
 | Users | The login table (the second "Organisers" box in the ERD) is named `Users` | Matches the plan's `Users` record |
 | Database | SQL Server with EF Core migrations instead of the MySQL scripts from Part 1 | Part 2 brief requires SQL Server |
 
+## External weather service
+`POST /api/events/{eventId}/weather/refresh` calls the free [Open-Meteo](https://open-meteo.com) API (no API key needed). The event's city is looked up in South Africa, using the event's province to choose between places with the same name, and the current temperature, wind speed and conditions are stored as a new `WeatherLog` row.
+
 Any further deviations will be listed here.
 
 Area	Change	Reason
@@ -138,3 +141,6 @@ Results	The leaderboard lists finishers by position first, then DNF and DNS	The 
 
 Sponsors	Linking a sponsor to an event returns 404 if the sponsor doesn’t exist, and GET /api/events/{eventId}/sponsors returns 404 if the event doesn’t exist	The plan listed only the 403 and 409 cases for these
 Sponsors	sponsorshipTier is required when linking, and contactEmail and logoUrl must be a valid email and URL	Basic input validation
+
+Weather	The refresh stores the current conditions at the event’s city, not a forecast for the event date	The plan describes a snapshot logged over time
+Weather	Refresh returns 400 if the event has no city and 404 if the city can’t be found, as well as the planned 404 (event missing) and 502 (service unavailable)	The weather lookup depends on the event’s city
