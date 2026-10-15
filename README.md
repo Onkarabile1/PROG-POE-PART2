@@ -125,3 +125,9 @@ Area	Change	Reason
 Events	DELETE /api/events/{id} returns 409 Conflict if the event has enrolments	Enrolments use a Restrict delete rule, so removing the event would otherwise fail with a database error
 Events	GET /api/events?date= matches that exact day. Without it, only upcoming events are listed	The plan didn’t say how the date filter works
 Categories	PUT /api/categories/{id} returns 409 Conflict if the new participant limit is below the number already enrolled	Prevents a category being over-full
+
+
+Enrolments	Bib numbers have the form E{eventId}-{running number}, for example E1-0001	The ERD only says the bib number is unique
+Enrolments	Re-enrolling after a cancellation reuses the cancelled record, and a Refunded or Pending payment is reset to Pending	A participant can only have one enrolment per category (unique index)
+Enrolments	Cancelling does not change the payment. An organiser refunds it with PUT /api/payments/{id}	The plan has a separate refund endpoint
+Payments	POST must send an amount equal to the category’s entry fee (otherwise 400). A cancelled enrolment returns 409	The plan says the payment is “for the entry fee”
