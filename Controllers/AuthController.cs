@@ -68,7 +68,29 @@ public class AuthController : ControllerBase
 
         return StatusCode(StatusCodes.Status201Created, UserResponse.From(user));
     }
+    // >>> Register
+    /// <summary>Registers a new Organiser or Participant account.</summary>
+    /// <remarks>
+    /// Public, no token needed. Creates the login account and the linked profile.
+    /// Body: email, password (at least 8 characters), role (Organiser or Participant), firstName, lastName,
+    /// phone (optional) and dateOfBirth (required for Participants only).
+    /// </remarks>
+    /// <response code="201">Account created. Returns the new user without the password.</response>
+    /// <response code="400">Validation failed, for example an invalid role or a Participant without a date of birth.</response>
+    /// <response code="409">The email is already registered.</response>
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status201Created)]
 
+    // >>> Login
+    /// <summary>Logs in and returns a JWT token.</summary>
+    /// <remarks>
+    /// Public, no token needed. Body: email and password.
+    /// Send the returned token as "Authorization: Bearer your-token" on protected requests,
+    /// or paste it into the Authorize button in Swagger.
+    /// </remarks>
+    /// <response code="200">Login succeeded. Returns the token and the user profile.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Invalid email or password.</response>
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
