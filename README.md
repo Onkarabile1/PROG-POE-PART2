@@ -64,7 +64,43 @@ The API follows the endpoint plan from Part 1 (`docs/api-endpoint-plan.md` in th
 | Weather | latest, history, refresh | TODO |
 
 ## Authentication and roles
-TODO: fill in after Step 3 (how login works, what Organiser and Participant can each do).
+
+The API uses JWT bearer authentication. A user registers, logs in to receive a token, and sends that token with every protected request.
+
+### How it works
+1. `POST /api/auth/register` creates a user with the role `Organiser` or `Participant`. The email must be unique.
+2. `POST /api/auth/login` checks the email and password and returns a JWT plus the user's profile. The token is valid for 8 hours.
+3. Protected endpoints need the header `Authorization: Bearer <token>`.
+
+The token carries the user's id, email, role and profile id as claims. Controllers use the role claim to decide who can do what.
+
+### Passwords
+Passwords are never stored in plain text. They are hashed with ASP.NET Core's `PasswordHasher` before they are saved in the `Users` table, and login compares the hash. A failed login returns the same message whether the email or the password was wrong.
+
+### Roles
+| Role | Can do |
+|---|---|
+| Organiser | Create and manage events, categories, sponsors and weather logs, and capture and correct results |
+| Participant | Browse events, enrol in categories, pay, and view their own enrolments and results |
+
+Both roles can view and update their own profile and change their own password.
+
+### Auth endpoints
+| Method | Endpoint | Access |
+|---|---|---|
+| POST | `/api/auth/register` | Public |
+| POST | `/api/auth/login` | Public |
+| GET | `/api/users/me` | Any logged-in user |
+| PUT | `/api/users/me` | Any logged-in user |
+| PUT | `/api/users/me/password` | Any logged-in user |
+
+### Trying it in Swagger
+1. Register a user, then log in and copy the `token` from the response.
+2. Click **Authorize** at the top of the Swagger page and paste the token.
+3. Call `GET /api/users/me` to confirm you are logged in.
+
+### Configuration
+JWT settings are in the `Jwt` section of `appsettings.json` (`Key`, `Issuer`, `Audience`). The key there is a development placeholder. In a real deployment it would be stored in a secret store or environment variable, not in source control.
 
 ## Running the tests
 TODO: fill in after Step 4.
