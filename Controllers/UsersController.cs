@@ -30,6 +30,30 @@ public class UsersController : ControllerBase
             .Include(u => u.Organiser)
             .Include(u => u.Participant)
             .FirstOrDefaultAsync(u => u.UserId == CurrentUserId);
+    // >>> GetMe
+    /// <summary>Returns the logged-in user's account and profile.</summary>
+    /// <remarks>Access: any logged-in user. No body.</remarks>
+    /// <response code="200">The user and their Organiser or Participant profile.</response>
+    /// <response code="401">Not logged in.</response>
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+
+    // >>> UpdateMe
+    /// <summary>Updates the logged-in user's own profile.</summary>
+    /// <remarks>
+    /// Access: any logged-in user.
+    /// Body: firstName, lastName, phone (optional) and dateOfBirth (optional, Participants only).
+    /// </remarks>
+    /// <response code="200">The updated profile.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in.</response>
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+
+    // >>> ChangePassword
+    /// <summary>Changes the logged-in user's password.</summary>
+    /// <remarks>Access: any logged-in user. Body: currentPassword and newPassword (at least 8 characters).</remarks>
+    /// <response code="200">Password updated.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in, or the current password is incorrect.</response>
 
     [HttpGet]
     public async Task<IActionResult> GetMe()
