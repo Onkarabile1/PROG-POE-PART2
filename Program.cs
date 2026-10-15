@@ -58,7 +58,9 @@ builder.Services.AddSwaggerGen(options =>
 
     // Reads the /// comments from the controllers so Swagger can show them.
     var xmlFile = $"{typeof(Program).Assembly.GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+        options.IncludeXmlComments(xmlPath);
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
