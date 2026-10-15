@@ -10,7 +10,10 @@ public class EventRequest
     [Required, MaxLength(200)]
     public string EventName { get; set; } = string.Empty;
 
+    /// <summary>Run, Walk or Cycle.</summary>
     [Required, MaxLength(50)]
+    [AllowedValues(EventTypes.Run, EventTypes.Walk, EventTypes.Cycle,
+        ErrorMessage = "Event type must be Run, Walk or Cycle.")]
     public string EventType { get; set; } = string.Empty;
 
     [Required]
