@@ -131,3 +131,7 @@ Enrolments	Bib numbers have the form E{eventId}-{running number}, for example E1
 Enrolments	Re-enrolling after a cancellation reuses the cancelled record, and a Refunded or Pending payment is reset to Pending	A participant can only have one enrolment per category (unique index)
 Enrolments	Cancelling does not change the payment. An organiser refunds it with PUT /api/payments/{id}	The plan has a separate refund endpoint
 Payments	POST must send an amount equal to the category’s entry fee (otherwise 400). A cancelled enrolment returns 409	The plan says the payment is “for the entry fee”
+
+Results	Status must be Finished, DNF or DNS. A Finished result needs a finish time and a position. A DNF or DNS result must not have either (400)	Keeps the leaderboard consistent
+Results	Capturing or correcting a result returns 409 if the position is already taken in that category, and capturing one for a cancelled enrolment also returns 409	Two people cannot share a position
+Results	The leaderboard lists finishers by position first, then DNF and DNS	The plan only says “ordered by position”
