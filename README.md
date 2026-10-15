@@ -122,6 +122,8 @@ The Part 1 ERD and endpoint plan disagree in a few places. The entities follow t
 ## External weather service
 `POST /api/events/{eventId}/weather/refresh` calls the free [Open-Meteo](https://open-meteo.com) API (no API key needed). The event's city is looked up in South Africa, using the event's province to choose between places with the same name, and the current temperature, wind speed and conditions are stored as a new `WeatherLog` row.
 
+## Swagger
+Run the API and open `/swagger`. Every endpoint shows its purpose, who may call it, the data it expects and the responses it can return. Click **Authorize** and paste the token from `POST /api/auth/login` to test the protected endpoints.
 Any further deviations will be listed here.
 
 Area	Change	Reason
