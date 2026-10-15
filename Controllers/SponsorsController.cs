@@ -18,7 +18,34 @@ public class SponsorsController : ControllerBase
     {
         _db = db;
     }
+    // >>> GetSponsors
+    /// <summary>Lists all sponsors on the platform.</summary>
+    /// <remarks>Public, no token needed. Ordered by name.</remarks>
+    /// <response code="200">All sponsors.</response>
+    [ProducesResponseType(typeof(IEnumerable<SponsorResponse>), StatusCodes.Status200OK)]
 
+    // >>> CreateSponsor
+    /// <summary>Creates a sponsor record.</summary>
+    /// <remarks>
+    /// Access: Organiser.
+    /// Body: sponsorName, contactEmail (optional, valid email), contactPhone (optional) and logoUrl (optional, valid URL).
+    /// </remarks>
+    /// <response code="201">Sponsor created.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Only Organisers can create sponsors.</response>
+    [ProducesResponseType(typeof(SponsorResponse), StatusCodes.Status201Created)]
+
+    // >>> UpdateSponsor
+    /// <summary>Updates a sponsor's details.</summary>
+    /// <remarks>Access: Organiser. Same body as creating a sponsor.</remarks>
+    /// <param name="id">The sponsor id.</param>
+    /// <response code="200">The updated sponsor.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Only Organisers can update sponsors.</response>
+    /// <response code="404">Sponsor not found.</response>
+    [ProducesResponseType(typeof(SponsorResponse), StatusCodes.Status200OK)]
     // Public.
     [HttpGet]
     public async Task<IActionResult> GetSponsors()
