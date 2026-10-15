@@ -23,7 +23,36 @@ public class WeatherController : ControllerBase
         _weather = weather;
         _logger = logger;
     }
+    // >>> GetLatestWeather
+    /// <summary>Returns the most recent weather snapshot for an event.</summary>
+    /// <remarks>Public, no token needed.</remarks>
+    /// <param name="eventId">The event id.</param>
+    /// <response code="200">The latest weather log.</response>
+    /// <response code="404">Event not found, or no weather has been logged yet.</response>
+    [ProducesResponseType(typeof(WeatherLogResponse), StatusCodes.Status200OK)]
 
+    // >>> GetWeatherHistory
+    /// <summary>Returns every weather snapshot logged for an event, newest first.</summary>
+    /// <remarks>Public, no token needed.</remarks>
+    /// <param name="eventId">The event id.</param>
+    /// <response code="200">All weather logs for the event.</response>
+    /// <response code="404">Event not found.</response>
+    [ProducesResponseType(typeof(IEnumerable<WeatherLogResponse>), StatusCodes.Status200OK)]
+
+    // >>> RefreshWeather
+    /// <summary>Fetches the current weather for the event's city and stores it as a new snapshot.</summary>
+    /// <remarks>
+    /// Access: the Organiser who owns the event. No body. Uses the free Open-Meteo service,
+    /// so the event needs a city.
+    /// </remarks>
+    /// <param name="eventId">The event id.</param>
+    /// <response code="201">New weather log created.</response>
+    /// <response code="400">The event has no city.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Event not found, or the weather service could not find the city.</response>
+    /// <response code="502">The external weather service is unavailable.</response>
+    [ProducesResponseType(typeof(WeatherLogResponse), StatusCodes.Status201Created)]
     // Public: the most recent snapshot.
     [HttpGet]
     public async Task<IActionResult> GetLatestWeather(int eventId)
