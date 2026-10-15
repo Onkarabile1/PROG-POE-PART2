@@ -48,6 +48,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "RaceDay API",
+        Version = "v1",
+        Description = "REST API for the RaceDay system: events, categories, enrolments, payments, results, sponsors and weather. " +
+                  "Log in with POST /api/auth/login, then use the Authorize button to paste the token."
+    });
+
+    // Reads the /// comments from the controllers so Swagger can show them.
+    var xmlFile = $"{typeof(Program).Assembly.GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
