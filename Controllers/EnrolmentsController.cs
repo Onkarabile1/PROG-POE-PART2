@@ -50,7 +50,49 @@ public class EnrolmentsController : ControllerBase
 
         return $"{prefix}{highest + 1:D4}";
     }
+    // >>> Enrol
+    /// <summary>Enrols the logged-in Participant in a category.</summary>
+    /// <remarks>
+    /// Access: Participant. No body, because the participant comes from the token.
+    /// Assigns a bib number (for example E1-0001) and creates a Pending payment for the entry fee.
+    /// </remarks>
+    /// <param name="categoryId">The category id.</param>
+    /// <response code="201">Enrolled. Returns the enrolment with its bib number.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Only Participants can enrol.</response>
+    /// <response code="404">Category not found.</response>
+    /// <response code="409">Already enrolled in this category, or the category is full.</response>
+    [ProducesResponseType(typeof(EnrolmentResponse), StatusCodes.Status201Created)]
 
+    // >>> GetMyEnrolments
+    /// <summary>Lists the logged-in Participant's own enrolments, past and upcoming.</summary>
+    /// <remarks>Access: Participant. No body. Newest event first.</remarks>
+    /// <response code="200">The participant's enrolments.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Only Participants have enrolments.</response>
+    [ProducesResponseType(typeof(IEnumerable<EnrolmentResponse>), StatusCodes.Status200OK)]
+
+    // >>> GetEnrolmentsForCategory
+    /// <summary>Lists everyone enrolled in a category.</summary>
+    /// <remarks>Access: the Organiser who owns the event. No body. Ordered by bib number.</remarks>
+    /// <param name="categoryId">The category id.</param>
+    /// <response code="200">The enrolments for the category.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Category not found.</response>
+    [ProducesResponseType(typeof(IEnumerable<EnrolmentResponse>), StatusCodes.Status200OK)]
+
+    // >>> CancelEnrolment
+    /// <summary>Cancels an enrolment.</summary>
+    /// <remarks>
+    /// Access: the Participant who owns the enrolment, or the Organiser who owns the event. No body.
+    /// The payment is not changed. An Organiser issues refunds with PUT /api/payments/id.
+    /// </remarks>
+    /// <param name="id">The enrolment id.</param>
+    /// <response code="200">Enrolment cancelled, or it was already cancelled.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not the owner of this enrolment or its event.</response>
+    /// <response code="404">Enrolment not found.</response>
     [HttpPost("api/categories/{categoryId:int}/enrolments")]
     [Authorize(Roles = Roles.Participant)]
     public async Task<IActionResult> Enrol(int categoryId)
