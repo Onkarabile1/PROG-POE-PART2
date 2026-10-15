@@ -14,9 +14,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<RaceDayDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
 // Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddHttpClient<IWeatherService, OpenMeteoWeatherService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 
 // JWT authentication
 var jwtKey = builder.Configuration["Jwt:Key"]
