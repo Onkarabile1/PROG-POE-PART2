@@ -19,7 +19,41 @@ public class PaymentsController : ControllerBase
     {
         _db = db;
     }
+    // >>> GetPayment
+    /// <summary>Returns the payment for an enrolment.</summary>
+    /// <remarks>Access: the Participant who owns the enrolment, or the Organiser who owns the event. No body.</remarks>
+    /// <param name="enrolmentId">The enrolment id.</param>
+    /// <response code="200">The payment.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not the owner of this enrolment or its event.</response>
+    /// <response code="404">Enrolment or payment not found.</response>
+    [ProducesResponseType(typeof(PaymentResponse), StatusCodes.Status200OK)]
 
+    // >>> SubmitPayment
+    /// <summary>Pays the entry fee for an enrolment.</summary>
+    /// <remarks>
+    /// Access: the Participant who owns the enrolment.
+    /// Body: amount (must equal the entry fee), paymentMethod and transactionRef (optional). The payment becomes Paid.
+    /// </remarks>
+    /// <param name="enrolmentId">The enrolment id.</param>
+    /// <response code="201">Payment recorded as Paid.</response>
+    /// <response code="400">Validation failed, or the amount does not equal the entry fee.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not a Participant, or not the owner of this enrolment.</response>
+    /// <response code="404">Enrolment not found.</response>
+    /// <response code="409">Already paid, or the enrolment is cancelled.</response>
+    [ProducesResponseType(typeof(PaymentResponse), StatusCodes.Status201Created)]
+
+    // >>> UpdatePaymentStatus
+    /// <summary>Changes a payment's status, for example to issue a refund.</summary>
+    /// <remarks>Access: the Organiser who owns the event. Body: paymentStatus (Pending, Paid or Refunded).</remarks>
+    /// <param name="id">The payment id.</param>
+    /// <response code="200">The updated payment.</response>
+    /// <response code="400">The status is not Pending, Paid or Refunded.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Payment not found.</response>
+    [ProducesResponseType(typeof(PaymentResponse), StatusCodes.Status200OK)]
     // Participant (own) or Organiser (owner).
     [HttpGet("api/enrolments/{enrolmentId:int}/payment")]
     public async Task<IActionResult> GetPayment(int enrolmentId)
