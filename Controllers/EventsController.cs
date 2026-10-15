@@ -19,7 +19,60 @@ public class EventsController : ControllerBase
     {
         _db = db;
     }
+    // >>> GetEvents
+    /// <summary>Lists upcoming events.</summary>
+    /// <remarks>
+    /// Public, no token needed. Without a date filter, only events from today onwards are returned, soonest first.
+    /// </remarks>
+    /// <param name="province">Optional. Only events in this province.</param>
+    /// <param name="eventType">Optional. Run, Walk or Cycle.</param>
+    /// <param name="date">Optional. Only events on this exact date (yyyy-MM-dd). Replaces the upcoming-only rule.</param>
+    /// <response code="200">The matching events.</response>
+    [ProducesResponseType(typeof(IEnumerable<EventResponse>), StatusCodes.Status200OK)]
 
+    // >>> GetEvent
+    /// <summary>Returns one event, including its categories.</summary>
+    /// <remarks>Public, no token needed. The categories carry the distances and route details.</remarks>
+    /// <param name="id">The event id.</param>
+    /// <response code="200">The event with its categories.</response>
+    /// <response code="404">Event not found.</response>
+    [ProducesResponseType(typeof(EventResponse), StatusCodes.Status200OK)]
+
+    // >>> CreateEvent
+    /// <summary>Creates a new event owned by the logged-in Organiser.</summary>
+    /// <remarks>
+    /// Access: Organiser.
+    /// Body: eventName, eventType (Run, Walk or Cycle), eventDate (yyyy-MM-dd), city, province, venue and description.
+    /// </remarks>
+    /// <response code="201">Event created.</response>
+    /// <response code="400">Validation failed, for example an event type that is not Run, Walk or Cycle.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Only Organisers can create events.</response>
+    [ProducesResponseType(typeof(EventResponse), StatusCodes.Status201Created)]
+
+    // >>> UpdateEvent
+    /// <summary>Updates an event.</summary>
+    /// <remarks>
+    /// Access: the Organiser who owns the event.
+    /// Body: eventName, eventType (Run, Walk or Cycle), eventDate, city, province, venue and description.
+    /// </remarks>
+    /// <param name="id">The event id.</param>
+    /// <response code="200">The updated event.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Event not found.</response>
+    [ProducesResponseType(typeof(EventResponse), StatusCodes.Status200OK)]
+
+    // >>> DeleteEvent
+    /// <summary>Deletes an event and its categories, sponsor links and weather logs.</summary>
+    /// <remarks>Access: the Organiser who owns the event. No body. Not allowed once anyone has enrolled.</remarks>
+    /// <param name="id">The event id.</param>
+    /// <response code="200">Event deleted.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Event not found.</response>
+    /// <response code="409">The event has enrolments, so it cannot be deleted.</response>
     // Public. Upcoming events by default; pass ?date=yyyy-MM-dd to see events on one specific day.
     [HttpGet]
     public async Task<IActionResult> GetEvents(
