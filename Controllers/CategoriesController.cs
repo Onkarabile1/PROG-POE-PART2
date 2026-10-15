@@ -20,7 +20,60 @@ public class CategoriesController : ControllerBase
     {
         _db = db;
     }
+    // >>> GetCategoriesForEvent
+    /// <summary>Lists the categories of an event, shortest distance first.</summary>
+    /// <remarks>Public, no token needed.</remarks>
+    /// <param name="eventId">The event id.</param>
+    /// <response code="200">The event's categories.</response>
+    /// <response code="404">Event not found.</response>
+    [ProducesResponseType(typeof(IEnumerable<CategoryResponse>), StatusCodes.Status200OK)]
 
+    // >>> GetCategory
+    /// <summary>Returns one category, including its route details.</summary>
+    /// <remarks>Public, no token needed. Route details are the start and end points, elevation gain and map link.</remarks>
+    /// <param name="id">The category id.</param>
+    /// <response code="200">The category.</response>
+    /// <response code="404">Category not found.</response>
+    [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status200OK)]
+
+    // >>> CreateCategory
+    /// <summary>Adds a category (for example 5km or Under 20) to an event.</summary>
+    /// <remarks>
+    /// Access: the Organiser who owns the event.
+    /// Body: categoryName, distanceKm, entryFee, maxParticipants, startPoint, endPoint, elevationGainM and mapUrl.
+    /// </remarks>
+    /// <param name="eventId">The event id.</param>
+    /// <response code="201">Category created.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Event not found.</response>
+    [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status201Created)]
+
+    // >>> UpdateCategory
+    /// <summary>Updates a category, including its route details.</summary>
+    /// <remarks>
+    /// Access: the Organiser who owns the event. Same body as creating a category.
+    /// The participant limit cannot be lower than the number already enrolled.
+    /// </remarks>
+    /// <param name="id">The category id.</param>
+    /// <response code="200">The updated category.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Category not found.</response>
+    /// <response code="409">The new participant limit is lower than the number already enrolled.</response>
+    [ProducesResponseType(typeof(CategoryResponse), StatusCodes.Status200OK)]
+
+    // >>> DeleteCategory
+    /// <summary>Deletes a category that has no active enrolments.</summary>
+    /// <remarks>Access: the Organiser who owns the event. No body.</remarks>
+    /// <param name="id">The category id.</param>
+    /// <response code="200">Category deleted.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Not an Organiser, or not the owner of this event.</response>
+    /// <response code="404">Category not found.</response>
+    /// <response code="409">The category has active enrolments.</response>
     // Public.
     [HttpGet("api/events/{eventId:int}/categories")]
     public async Task<IActionResult> GetCategoriesForEvent(int eventId)
