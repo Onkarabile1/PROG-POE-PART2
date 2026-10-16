@@ -131,6 +131,7 @@ The tests are in `RaceDay.Tests` (xUnit). They start the real API in memory with
 - **Visual Studio:** Test > Run All Tests
 - **Command line:** `dotnet test`
 
+
 | Area | What is tested |
 |---|---|
 | Registration and login | Success for both roles; invalid role, email and password; duplicate email; wrong password; the password is stored hashed; the token works on protected endpoints |
@@ -140,6 +141,20 @@ The tests are in `RaceDay.Tests` (xUnit). They start the real API in memory with
 | Event enrolments | A Participant can enrol and the participant, event, category, bib number and pending payment are recorded; duplicates and full categories return 409; cancelling and re-enrolling |
 | Payments and results | Paying the exact fee, refunds, capturing and correcting results, and the public leaderboard |
 
+
+## CI/CD
+
+A GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every push and pull request to `master`:
+
+1. Checks out the code
+2. Installs .NET 8
+3. Restores NuGet packages
+4. Builds the API in Release mode
+
+A build error fails the workflow, so broken code is caught on every push.
+The unit tests are not part of this pipeline yet.
+
+![CI](https://github.com/Onkarabile1/YOUR-REPO-NAME/actions/workflows/ci.yml/badge.svg)
 The in-memory database does not enforce SQL Server constraints such as unique indexes, so the rules the tests check are the ones the controllers enforce.
 
 Any further deviations will be listed here.
