@@ -1,0 +1,26 @@
+   name: CI
+
+   on:
+     push:
+       branches: [ master, main ]
+     pull_request:
+       branches: [ master, main ]
+
+   jobs:
+     build:
+       runs-on: ubuntu-latest
+
+       steps:
+         - name: Check out code
+           uses: actions/checkout@v4
+
+         - name: Set up .NET 8
+           uses: actions/setup-dotnet@v4
+           with:
+             dotnet-version: 8.0.x
+
+         - name: Restore dependencies
+           run: dotnet restore RaceDay.API.csproj
+
+         - name: Build
+           run: dotnet build RaceDay.API.csproj --no-restore --configuration Release
