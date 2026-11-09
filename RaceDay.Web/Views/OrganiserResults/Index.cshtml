@@ -1,0 +1,92 @@
+﻿@model ResultsPageViewModel
+@{
+    ViewData["Title"] = "Enter results";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-0">Results</h1>
+        <div class="text-muted">@Model.Event.EventName &middot; @Model.Event.EventDate.ToString("dd MMM yyyy")</div>
+    </div>
+    <a class="btn btn-outline-secondary" asp-controller="OrganiserEvents" asp-action="Index">Back to events</a>
+</div>
+
+@if (Model.Categories.Count == 0)
+{
+    <div class="alert alert-info">Add a category to this event before capturing results.</div>
+}
+else
+{
+    <ul class="nav nav-pills mb-3">
+        @foreach (var c in Model.Categories)
+        {
+            <li class="nav-item">
+                <a class="nav-link @(c.CategoryId == Model.Selected?.CategoryId ? "active" : "")"
+                   asp-action="Index" asp-route-eventId="@Model.Event.EventId" asp-route-categoryId="@c.CategoryId">@c.CategoryName</a>
+            </li>
+        }
+    </ul>
+
+    @if (!Model.CanEnterResults)
+    {
+        <div class="alert alert-warning">
+            Results can be entered from the event date (@Model.Event.EventDate.ToString("dd MMM yyyy")) onwards.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-secondary">
+            Results are published to the public leaderboard as soon as you save them.
+            DNF and DNS results have no time or position.
+        </div>
+    }
+
+    @if (Model.Rows.Count == 0)
+    {
+        <p class="text-muted">Nobody is enrolled in this category yet.</p>
+    }
+
+    @foreach (var row in Model.Rows)
+    {
+        <form asp-action="Save" method="post" class="card mb-2">
+            <div class="card-body py-3">
+                <input type="hidden" name="EventId" value="@Model.Event.EventId" />
+                <input type="hidden" name="CategoryId" value="@Model.Selected!.CategoryId" />
+                <input type="hidden" name="EnrolmentId" value="@row.EnrolmentId" />
+                <input type="hidden" name="ResultId" value="@row.ResultId" />
+
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-3">
+                        <strong>@row.ParticipantName</strong>
+                        <div class="small text-muted">Bib @row.BibNumber</div>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="Status" class="form-select form-select-sm" disabled="@(!Model.CanEnterResults)">
+                            @foreach (var s in FormOptions.ResultStatuses)
+                            {
+                                <option value="@s" selected="@(row.Status == s)">@s</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input name="FinishTime" value="@row.FinishTimeText" placeholder="hh:mm:ss"
+                               class="form-control form-control-sm" disabled="@(!Model.CanEnterResults)" />
+                    </div>
+                    <div class="col-md-2">
+                        <input name="Position" type="number" min="1" value="@row.Position" placeholder="Position"
+                               class="form-control form-control-sm" disabled="@(!Model.CanEnterResults)" />
+                    </div>
+                    <div class="col-md-2 d-flex align-items-center gap-2">
+                        <button type="submit" class="btn btn-sm btn-primary" disabled="@(!Model.CanEnterResults)">
+                            @(row.ResultId is null ? "Save" : "Update")
+                        </button>
+                        @if (row.ResultId is not null)
+                        {
+                            <span class="rd-status rd-status-confirmed">Published</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </form>
+    }
+}
