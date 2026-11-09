@@ -1,22 +1,93 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+:root {
+    --rd-navy: #0b1f3a;
+    --rd-orange: #ff6b1a;
+    --rd-orange-dark: #e0560c;
+    --rd-light: #f4f6fa;
+    --rd-text: #1b2430;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    background: var(--rd-light);
+    color: var(--rd-text);
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+    margin-bottom: 70px;
+}
+
+a {
+    color: var(--rd-orange-dark);
+}
+
+.rd-navbar {
+    background: var(--rd-navy);
+    border-bottom: 4px solid var(--rd-orange);
+}
+
+.rd-brand {
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+    .rd-brand span {
+        color: var(--rd-orange);
+    }
+
+.rd-role-badge {
+    background: var(--rd-orange);
+}
+
+.btn-primary {
+    background-color: var(--rd-orange);
+    border-color: var(--rd-orange);
+    font-weight: 600;
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+        background-color: var(--rd-orange-dark);
+        border-color: var(--rd-orange-dark);
+    }
+
+.btn-outline-primary {
+    color: var(--rd-orange-dark);
+    border-color: var(--rd-orange);
+}
+
+    .btn-outline-primary:hover,
+    .btn-check:checked + .btn-outline-primary {
+        background-color: var(--rd-orange);
+        border-color: var(--rd-orange);
+        color: #fff;
+    }
+
+.card {
+    border: 0;
+    border-radius: .75rem;
+}
+
+.rd-hero {
+    background: linear-gradient(135deg, var(--rd-navy) 0%, #16345f 100%);
+    color: #fff;
+    border-radius: 1rem;
+    border-left: 8px solid var(--rd-orange);
+}
+
+.rd-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    line-height: 60px;
+    background: var(--rd-navy);
+    color: #c9d3e3;
+    font-size: .9rem;
+}
+
+.validation-summary-valid {
+    display: none;
 }
