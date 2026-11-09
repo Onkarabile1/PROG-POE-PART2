@@ -45,6 +45,7 @@ public class UserResponse
     public string LastName { get; set; } = string.Empty;
     public string? Phone { get; set; }
     public DateOnly? DateOfBirth { get; set; }
+    public string? ProfilePictureUrl { get; set; }
 
     // Expects the Organiser/Participant navigation property to be loaded.
     public static UserResponse From(RaceDay.API.Models.User user)
@@ -53,7 +54,8 @@ public class UserResponse
         {
             UserId = user.UserId,
             Email = user.Email,
-            Role = user.Role
+            Role = user.Role,
+        ProfilePictureUrl = user.ProfilePictureUrl,
         };
 
         if (user.Organiser is not null)

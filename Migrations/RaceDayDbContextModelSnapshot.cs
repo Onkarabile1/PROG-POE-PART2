@@ -107,6 +107,44 @@ namespace RaceDay.API.Migrations
                     b.ToTable("Participants");
                 });
 
+            modelBuilder.Entity("RaceDay.API.Models.User", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("RaceDay.Api.Models.Category", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -201,6 +239,10 @@ namespace RaceDay.API.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventId"));
+
+                    b.Property<string>("BannerUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("City")
                         .HasMaxLength(100)
@@ -372,40 +414,6 @@ namespace RaceDay.API.Migrations
                     b.ToTable("Sponsors");
                 });
 
-            modelBuilder.Entity("RaceDay.Api.Models.User", b =>
-                {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("UserId");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.ToTable("Users");
-                });
-
             modelBuilder.Entity("RaceDay.Api.Models.WeatherLog", b =>
                 {
                     b.Property<int>("WeatherLogId")
@@ -439,7 +447,7 @@ namespace RaceDay.API.Migrations
 
             modelBuilder.Entity("RaceDay.API.Models.Organiser", b =>
                 {
-                    b.HasOne("RaceDay.Api.Models.User", "User")
+                    b.HasOne("RaceDay.API.Models.User", "User")
                         .WithOne("Organiser")
                         .HasForeignKey("RaceDay.API.Models.Organiser", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -450,7 +458,7 @@ namespace RaceDay.API.Migrations
 
             modelBuilder.Entity("RaceDay.API.Models.Participant", b =>
                 {
-                    b.HasOne("RaceDay.Api.Models.User", "User")
+                    b.HasOne("RaceDay.API.Models.User", "User")
                         .WithOne("Participant")
                         .HasForeignKey("RaceDay.API.Models.Participant", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -572,6 +580,13 @@ namespace RaceDay.API.Migrations
                     b.Navigation("Enrolments");
                 });
 
+            modelBuilder.Entity("RaceDay.API.Models.User", b =>
+                {
+                    b.Navigation("Organiser");
+
+                    b.Navigation("Participant");
+                });
+
             modelBuilder.Entity("RaceDay.Api.Models.Category", b =>
                 {
                     b.Navigation("Enrolments");
@@ -596,13 +611,6 @@ namespace RaceDay.API.Migrations
             modelBuilder.Entity("RaceDay.Api.Models.Sponsor", b =>
                 {
                     b.Navigation("EventSponsors");
-                });
-
-            modelBuilder.Entity("RaceDay.Api.Models.User", b =>
-                {
-                    b.Navigation("Organiser");
-
-                    b.Navigation("Participant");
                 });
 #pragma warning restore 612, 618
         }

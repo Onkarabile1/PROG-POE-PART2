@@ -86,7 +86,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-
+builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

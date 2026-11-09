@@ -22,6 +22,7 @@ public class Event
     [MaxLength(100)] public string? Province { get; set; }
     [MaxLength(200)] public string? Venue { get; set; }
     [MaxLength(1000)] public string? Description { get; set; }
+    [MaxLength(500)] public string? BannerUrl { get; set; }
 
     public ICollection<Category> Categories { get; set; } = new List<Category>();
     public ICollection<EventSponsor> EventSponsors { get; set; } = new List<EventSponsor>();
