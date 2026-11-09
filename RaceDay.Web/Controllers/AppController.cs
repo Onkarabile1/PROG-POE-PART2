@@ -17,4 +17,14 @@ public abstract class AppController : Controller
         ShowError("Your session has expired. Please log in again.");
         return RedirectToAction("Login", "Account");
     }
+
+    /// <summary>A failed API call: an expired login goes to the login page, anything else shows the message.</summary>
+    protected IActionResult HandleFailure(ApiResult result, IActionResult fallback)
+    {
+        if (result.IsUnauthorized)
+            return ExpiredSession();
+
+        ShowError(result.Error);
+        return fallback;
+    }
 }
