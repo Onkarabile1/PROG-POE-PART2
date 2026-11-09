@@ -1,3 +1,5 @@
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 using RaceDay.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +39,15 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// One fixed culture, so numbers and dates are read and shown the same way on every machine and in Docker.
+var culture = new CultureInfo("en-US");
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(culture),
+    SupportedCultures = new[] { culture },
+    SupportedUICultures = new[] { culture }
+});
 
 // Stop browsers caching pages, so the Back button cannot show a protected page after logging out.
 app.Use(async (context, next) =>

@@ -91,3 +91,47 @@ a {
 .validation-summary-valid {
     display: none;
 }
+/* Enrolment and result statuses */
+.rd-status {
+    display: inline-block;
+    padding: .25rem .65rem;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 600;
+}
+
+.rd-status-confirmed {
+    background: #d9f4e3;
+    color: #14633a;
+}
+
+.rd-status-pending {
+    background: #fff0cc;
+    color: #8a5a00;
+}
+
+.rd-status-cancelled {
+    background: #fde0e0;
+    color: #9b1c1c;
+}
+
+.rd-status-refunded {
+    background: #e4e8ef;
+    color: #46506a;
+}
+
+.rd-stat-number {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--rd-orange);
+    line-height: 1.1;
+}
+
+.nav-pills .nav-link {
+    color: var(--rd-navy);
+}
+
+    .nav-pills .nav-link.active {
+        background-color: var(--rd-orange);
+        color: #fff;
+    }
