@@ -75,6 +75,7 @@ public class EventsController : ControllerBase
     /// <response code="409">The event has enrolments, so it cannot be deleted.</response>
     // Public. Upcoming events by default; pass ?date=yyyy-MM-dd to see events on one specific day.
     [HttpGet]
+
     public async Task<IActionResult> GetEvents(
         [FromQuery] string? province,
         [FromQuery] string? eventType,
@@ -102,7 +103,42 @@ public class EventsController : ControllerBase
         var events = await query.OrderBy(e => e.Date).ToListAsync();
         return Ok(events.Select(e => EventResponse.From(e)));
     }
+    /// <summary>Lists the logged-in Organiser's own events, past and upcoming, with their categories and enrolment counts.</summary>
+    /// <remarks>Used by the Organiser dashboard in the web application. Sorted by date, soonest first. Cancelled enrolments are not counted.</remarks>
+    /// <response code="200">The Organiser's events.</response>
+    /// <response code="401">No valid login token was sent.</response>
+    /// <response code="403">The logged-in user is not an Organiser.</response>
+    [HttpGet("mine")]
+    [Authorize(Roles = Roles.Organiser)]
+    [ProducesResponseType(typeof(IEnumerable<EventResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetMyEvents()
+    {
+        var organiserId = User.GetProfileId();
 
+        var events = await _db.Events
+            .AsNoTracking()
+            .Include(e => e.Categories)
+            .Where(e => e.OrganiserId == organiserId)
+            .OrderBy(e => e.Date)
+            .ToListAsync();
+
+        var counts = await _db.Enrolments
+            .Where(en => en.Category.Event.OrganiserId == organiserId && en.Status == EnrolmentStatuses.Active)
+            .GroupBy(en => en.Category.EventId)
+            .Select(g => new { EventId = g.Key, Total = g.Count() })
+            .ToDictionaryAsync(x => x.EventId, x => x.Total);
+
+        var response = events.Select(e =>
+        {
+            var item = EventResponse.From(e, includeCategories: true);
+            item.EnrolmentCount = counts.TryGetValue(e.EventId, out var total) ? total : 0;
+            return item;
+        });
+
+        return Ok(response);
+    }
     // Public.
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetEvent(int id)

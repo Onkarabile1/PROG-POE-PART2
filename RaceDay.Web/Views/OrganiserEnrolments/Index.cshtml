@@ -1,0 +1,70 @@
+﻿@model EnrolmentsPageViewModel
+@{
+    ViewData["Title"] = "Enrolments";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-0">Enrolments</h1>
+        <div class="text-muted">@Model.Event.EventName &middot; @Model.Event.EventDate.ToString("dd MMM yyyy")</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary" asp-controller="OrganiserResults" asp-action="Index" asp-route-eventId="@Model.Event.EventId">Enter results</a>
+        <a class="btn btn-outline-secondary" asp-controller="OrganiserEvents" asp-action="Index">Back to events</a>
+    </div>
+</div>
+
+<div class="mb-4">
+    <span class="rd-status rd-status-confirmed me-2">@Model.ConfirmedCount Confirmed</span>
+    <span class="rd-status rd-status-pending me-2">@Model.PendingCount Pending</span>
+    <span class="rd-status rd-status-cancelled">@Model.CancelledCount Cancelled</span>
+</div>
+
+@if (Model.Groups.Count == 0)
+{
+    <div class="alert alert-info">This event has no categories yet, so nobody can enrol.</div>
+}
+
+@foreach (var group in Model.Groups)
+{
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="h5 mb-1">@group.Category.CategoryName</h2>
+            <div class="text-muted mb-3">
+                @group.Category.DistanceKm.ToString("0.##") km &middot;
+                @group.Enrolments.Count(e => e.Status == "Active") of @group.Category.MaxParticipants places taken
+            </div>
+
+            @if (group.Enrolments.Count == 0)
+            {
+                <p class="text-muted mb-0">Nobody has enrolled in this category yet.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Bib</th>
+                                <th>Participant</th>
+                                <th>Enrolled on</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var en in group.Enrolments)
+                            {
+                                <tr>
+                                    <td><strong>@en.BibNumber</strong></td>
+                                    <td>@en.ParticipantName</td>
+                                    <td>@en.EnrolmentDate.ToLocalTime().ToString("dd MMM yyyy")</td>
+                                    <td><partial name="_StatusBadge" model="en" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+}
