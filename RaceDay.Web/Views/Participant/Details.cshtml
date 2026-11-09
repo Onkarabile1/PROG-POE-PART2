@@ -1,0 +1,72 @@
+﻿@model EventDetailsViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = ev.EventName;
+}
+
+<a asp-action="Events" class="text-decoration-none">&larr; Back to events</a>
+
+@if (!string.IsNullOrEmpty(ev.BannerUrl))
+{
+    <img src="@ev.BannerUrl" class="rd-detail-banner mt-3" alt="@ev.EventName banner" />
+}
+
+<div class="d-flex justify-content-between align-items-start mt-3">
+    <div>
+        <span class="badge rd-type-badge mb-2">@ev.EventType</span>
+        <h1 class="rd-page-title">@ev.EventName</h1>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card p-3">
+            <p class="mb-1 text-muted">Date</p><p><strong>@ev.EventDate.ToString("dddd, d MMMM yyyy")</strong></p>
+            <p class="mb-1 text-muted">Where</p><p><strong>@(string.IsNullOrEmpty(ev.Location) ? "To be announced" : ev.Location)</strong></p>
+            <p class="mb-1 text-muted">Distances</p><p class="mb-0"><strong>@ev.Distances</strong></p>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <h4>About this event</h4>
+        <p>@(string.IsNullOrWhiteSpace(ev.Description) ? "No description has been added yet." : ev.Description)</p>
+    </div>
+</div>
+
+<h4 class="mt-4">Categories</h4>
+@if (ev.Categories is { Count: > 0 })
+{
+    <div class="table-responsive">
+        <table class="table align-middle rd-table">
+            <thead><tr><th>Category</th><th>Distance</th><th>Entry fee</th><th>Max entrants</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var c in ev.Categories)
+                {
+                    <tr>
+                        <td>@c.CategoryName</td>
+                        <td>@c.DistanceKm.ToString("0.##") km</td>
+                        <td>R@c.EntryFee.ToString("0.00")</td>
+                        <td>@(c.MaxParticipants?.ToString() ?? "No limit")</td>
+                        <td class="text-end">
+                            @if (Model.EnrolledCategoryIds.Contains(c.CategoryId))
+                            {
+                                <span class="badge bg-success">Enrolled</span>
+                            }
+                            else if (ev.IsUpcoming)
+                            {
+                                <form asp-action="Enrol" method="post" onsubmit="return confirm('Enrol in @c.CategoryName?');">
+                                    <input type="hidden" name="eventId" value="@ev.EventId" />
+                                    <input type="hidden" name="categoryId" value="@c.CategoryId" />
+                                    <button class="btn btn-primary btn-sm" type="submit">Enrol</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">The organiser hasn't added categories yet.</div>
+}

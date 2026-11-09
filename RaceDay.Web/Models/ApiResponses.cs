@@ -68,7 +68,11 @@ public class EnrolmentResponse
         "Cancelled" => "rd-status-cancelled",
         "Refunded" => "rd-status-refunded",
         _ => "rd-status-pending"
+    
+    
     };
+    public bool CanPay => DisplayStatus == "Pending";
+    public bool CanCancel => !Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase);
 }
 
 public class ResultResponse
