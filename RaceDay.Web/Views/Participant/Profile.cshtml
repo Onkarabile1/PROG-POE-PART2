@@ -1,0 +1,36 @@
+﻿@model ProfileViewModel
+@{
+    ViewData["Title"] = "My profile";
+}
+
+<h1 class="rd-page-title mb-3">My profile</h1>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card p-4 text-center">
+            @if (!string.IsNullOrEmpty(Model.PictureUrl))
+            {
+                <img src="@Model.PictureUrl" class="rd-avatar mx-auto mb-3" alt="Profile picture" />
+            }
+            else
+            {
+
+                <div class="rd-avatar rd-avatar-placeholder mx-auto mb-3">@(Model.Fields.Values.FirstOrDefault(v => !string.IsNullOrEmpty(v))?[..1].ToUpper())</div>
+            }
+            @* PICTURE-UPLOAD-FORM (added in Step 4) *@
+        </div>
+    </div>
+    <div class="col-md-8">
+        <form asp-action="Profile" method="post" class="card p-4">
+            @foreach (var f in Model.Fields)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@ProfileViewModel.Label(f.Key)</label>
+                    <input class="form-control" name="Fields[@f.Key]" value="@f.Value"
+                           type="@(f.Key.Contains("mail", StringComparison.OrdinalIgnoreCase) ? "email" : "text")" />
+                </div>
+            }
+            <button class="btn btn-primary" type="submit">Save changes</button>
+        </form>
+    </div>
+</div>
