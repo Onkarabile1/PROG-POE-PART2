@@ -55,5 +55,9 @@ public class EventResponse
         Categories = includeCategories
             ? e.Categories.OrderBy(c => c.DistanceKm).Select(CategoryResponse.From).ToList()
             : null
-    };
+   
+};
+    // Only filled in by GET /api/events/mine.
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? EnrolmentCount { get; set; }
 }
