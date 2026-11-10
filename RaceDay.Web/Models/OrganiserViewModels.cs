@@ -82,6 +82,8 @@ public class CategoryFormViewModel
     [Url(ErrorMessage = "Please enter a valid web address."), StringLength(500)]
     [Display(Name = "Map link")]
     public string? MapUrl { get; set; }
+    public IFormFile? Banner { get; set; }
+    public string? ExistingBannerUrl { get; set; }
 }
 
 public class CategoriesPageViewModel
