@@ -20,4 +20,5 @@ public class User
 
     public Organiser? Organiser { get; set; }
     public Participant? Participant { get; set; }
+    [MaxLength(500)] public string? ProfilePictureUrl { get; set; }
 }

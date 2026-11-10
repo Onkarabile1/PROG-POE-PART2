@@ -221,4 +221,26 @@ public class EventsController : ControllerBase
 
         return Ok(new { message = "Event deleted." });
     }
+    /// <summary>Uploads or replaces the banner image of an event (stored in Azure Blob Storage).</summary>
+    /// <remarks>Organiser who owns the event only. JPG, PNG or WEBP, max 5 MB.</remarks>
+    [HttpPost("{id:int}/banner")]
+    [Authorize(Roles = Roles.Organiser)]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(typeof(EventResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UploadBanner(int id, IFormFile file, [FromServices] IBlobStorageService blobs)
+    {
+        var ev = await _db.Events.Include(e => e.Categories).FirstOrDefaultAsync(e => e.EventId == id);
+        if (ev is null) return NotFound();
+        if (ev.OrganiserId != User.GetProfileId()) return Forbid();
+
+        try { ev.BannerUrl = await blobs.UploadImageAsync(file, "banners"); }
+        catch (ArgumentException ex) { return Problem(detail: ex.Message, statusCode: StatusCodes.Status400BadRequest); }
+
+        await _db.SaveChangesAsync();
+        return Ok(EventResponse.From(ev, includeCategories: true));
+    }
 }

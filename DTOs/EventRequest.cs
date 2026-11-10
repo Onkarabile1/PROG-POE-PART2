@@ -52,12 +52,15 @@ public class EventResponse
         Province = e.Province,
         Venue = e.Venue,
         Description = e.Description,
+        BannerUrl = e.BannerUrl,
         Categories = includeCategories
             ? e.Categories.OrderBy(c => c.DistanceKm).Select(CategoryResponse.From).ToList()
             : null
-   
-};
+
+    };
     // Only filled in by GET /api/events/mine.
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? EnrolmentCount { get; set; }
+
+    public string? BannerUrl { get; set; }
 }

@@ -65,3 +65,9 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+builder.Services.AddHttpClient<IRaceDayUploads, RaceDayUploads>(c =>
+{
+    c.BaseAddress = new Uri(builder.Configuration["Api:BaseUrl"]!);
+    c.Timeout = TimeSpan.FromSeconds(60);
+});

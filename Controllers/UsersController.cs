@@ -1,10 +1,12 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RaceDay.API.Data;
 using RaceDay.API.DTOs;
+using RaceDay.API.Models;
+using RaceDay.API.Services;
+using System.Security.Claims;
 using AppUser = RaceDay.API.Models.User;
 
 namespace RaceDay.API.Controllers;
@@ -56,6 +58,7 @@ public class UsersController : ControllerBase
     /// <response code="401">Not logged in, or the current password is incorrect.</response>
 
     [HttpGet]
+
     public async Task<IActionResult> GetMe()
     {
         var user = await LoadCurrentUser();
@@ -63,7 +66,27 @@ public class UsersController : ControllerBase
 
         return Ok(UserResponse.From(user));
     }
+    /// <summary>Uploads or replaces the signed-in user's profile picture (Azure Blob Storage).</summary>
+    [HttpPost("me/picture")]
+    [Authorize]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UploadPicture(IFormFile file, [FromServices] IBlobStorageService blobs)
+    {
+        // >>> load the current user exactly the way GetMe does, into a variable called `user`
+        // (return Unauthorized() / NotFound() the same way GetMe does if it is missing)
+        var user = await LoadCurrentUser();
 
+        if (user is null)
+            return Unauthorized();
+        try { user.ProfilePictureUrl = await blobs.UploadImageAsync(file, "profiles"); }
+        catch (ArgumentException ex) { return Problem(detail: ex.Message, statusCode: StatusCodes.Status400BadRequest); }
+
+        await _db.SaveChangesAsync();
+        return Ok(new { profilePictureUrl = user.ProfilePictureUrl });
+    }
     [HttpPut]
     public async Task<IActionResult> UpdateMe(UpdateProfileRequest request)
     {

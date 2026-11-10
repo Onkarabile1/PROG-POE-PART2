@@ -9,8 +9,8 @@
             <div class="card-body p-4">
                 <h1 class="h3 mb-3">@(Model.IsEdit ? "Edit event" : "Create an event")</h1>
 
-                <form asp-action="@(Model.IsEdit ? "Edit" : "Create")" asp-route-id="@Model.EventId" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                enctype="multipart/form-data"                   
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <div class="row">
                         <div class="col-md-8 mb-3">
@@ -68,7 +68,7 @@
                         <button type="submit" class="btn btn-primary">@(Model.IsEdit ? "Save changes" : "Create event")</button>
                         <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
                     </div>
-                </form>
+               
             </div>
         </div>
     </div>
