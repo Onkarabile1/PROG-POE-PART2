@@ -37,6 +37,7 @@ public class EventResponse
     public string? Venue { get; set; }
     public string? Description { get; set; }
 
+
     // Only filled in by GET /api/events/{id}.
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<CategoryResponse>? Categories { get; set; }

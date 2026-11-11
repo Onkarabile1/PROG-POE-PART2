@@ -41,6 +41,8 @@ public class EventFormViewModel
     public string? Venue { get; set; }
 
     public bool IsEdit => EventId.HasValue;
+    public IFormFile? Banner { get; set; }
+    public string? ExistingBannerUrl { get; set; }
 }
 
 public class CategoryFormViewModel

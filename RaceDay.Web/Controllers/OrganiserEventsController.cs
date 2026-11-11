@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RaceDay.Web.Models;
 using RaceDay.Web.Services;
+using System.Reflection;
 
 namespace RaceDay.Web.Controllers;
 
@@ -67,32 +68,12 @@ public class OrganiserEventsController : OrganiserBaseController
             Description = ev.Description,
             City = ev.City,
             Province = ev.Province,
-            Venue = ev.Venue
+            Venue = ev.Venue,
+            ExistingBannerUrl = ev.BannerUrl,
+
         });
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, EventFormViewModel model)
-    {
-        model.EventId = id;
-
-        if (!ModelState.IsValid)
-            return View("Form", model);
-
-        var result = await Api.PutAsync<EventResponse>($"api/events/{id}", ToRequest(model));
-
-        if (!result.Success)
-        {
-            if (result.IsUnauthorized)
-                return ExpiredSession();
-
-            ModelState.AddModelError(string.Empty, result.Error);
-            return View("Form", model);
-        }
-
-        ShowSuccess($"\"{model.EventName}\" was updated.");
-        return RedirectToAction(nameof(Index));
-    }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
@@ -106,6 +87,17 @@ public class OrganiserEventsController : OrganiserBaseController
         return RedirectToAction(nameof(Index));
     }
 
+    // CHANGED: shared helper used by Create and Edit. Returns null on success or when no file was chosen.
+    private async Task<string?> UploadBannerAsync(int eventId, IFormFile? banner)
+    {
+        if (banner is null || banner.Length == 0)
+            return null;
+
+        var uploads = HttpContext.RequestServices.GetRequiredService<IRaceDayUploads>();
+        var up = await uploads.UploadAsync($"api/events/{eventId}/banner", banner);
+        return up.Success ? null : up.Error ?? "Upload failed.";
+    }
+
     private static object ToRequest(EventFormViewModel m) => new
     {
         eventName = m.EventName.Trim(),
@@ -114,6 +106,6 @@ public class OrganiserEventsController : OrganiserBaseController
         city = m.City,
         province = m.Province,
         venue = m.Venue,
-        description = m.Description
+        description = m.Description,
     };
 }

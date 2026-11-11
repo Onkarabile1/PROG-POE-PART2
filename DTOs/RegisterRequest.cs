@@ -52,6 +52,7 @@ public class UserResponse
     {
         var response = new UserResponse
         {
+
             UserId = user.UserId,
             Email = user.Email,
             Role = user.Role,
@@ -82,4 +83,6 @@ public class AuthResponse
 {
     public string Token { get; set; } = string.Empty;
     public UserResponse User { get; set; } = null!;
+    public string? ProfilePictureUrl { get; set; }
+
 }
