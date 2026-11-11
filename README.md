@@ -1,4 +1,4 @@
-# RaceDay API (Part 2)
+Ôªø# RaceDay API (Part 2)
 
 RESTful API that powers the RaceDay system. It handles all data operations, enforces role-based access for Organisers and Participants, and is tested and built automatically with GitHub Actions.
 
@@ -162,21 +162,66 @@ Any further deviations will be listed here.
 
 Area	Change	Reason
 Events	DELETE /api/events/{id} returns 409 Conflict if the event has enrolments	Enrolments use a Restrict delete rule, so removing the event would otherwise fail with a database error
-Events	GET /api/events?date= matches that exact day. Without it, only upcoming events are listed	The plan didnít say how the date filter works
+Events	GET /api/events?date= matches that exact day. Without it, only upcoming events are listed	The plan didn‚Äôt say how the date filter works
 Categories	PUT /api/categories/{id} returns 409 Conflict if the new participant limit is below the number already enrolled	Prevents a category being over-full
 
 
 Enrolments	Bib numbers have the form E{eventId}-{running number}, for example E1-0001	The ERD only says the bib number is unique
 Enrolments	Re-enrolling after a cancellation reuses the cancelled record, and a Refunded or Pending payment is reset to Pending	A participant can only have one enrolment per category (unique index)
 Enrolments	Cancelling does not change the payment. An organiser refunds it with PUT /api/payments/{id}	The plan has a separate refund endpoint
-Payments	POST must send an amount equal to the categoryís entry fee (otherwise 400). A cancelled enrolment returns 409	The plan says the payment is ìfor the entry feeî
+Payments	POST must send an amount equal to the category‚Äôs entry fee (otherwise 400). A cancelled enrolment returns 409	The plan says the payment is ‚Äúfor the entry fee‚Äù
 
 Results	Status must be Finished, DNF or DNS. A Finished result needs a finish time and a position. A DNF or DNS result must not have either (400)	Keeps the leaderboard consistent
 Results	Capturing or correcting a result returns 409 if the position is already taken in that category, and capturing one for a cancelled enrolment also returns 409	Two people cannot share a position
-Results	The leaderboard lists finishers by position first, then DNF and DNS	The plan only says ìordered by positionî
+Results	The leaderboard lists finishers by position first, then DNF and DNS	The plan only says ‚Äúordered by position‚Äù
 
-Sponsors	Linking a sponsor to an event returns 404 if the sponsor doesnít exist, and GET /api/events/{eventId}/sponsors returns 404 if the event doesnít exist	The plan listed only the 403 and 409 cases for these
+Sponsors	Linking a sponsor to an event returns 404 if the sponsor doesn‚Äôt exist, and GET /api/events/{eventId}/sponsors returns 404 if the event doesn‚Äôt exist	The plan listed only the 403 and 409 cases for these
 Sponsors	sponsorshipTier is required when linking, and contactEmail and logoUrl must be a valid email and URL	Basic input validation
 
-Weather	The refresh stores the current conditions at the eventís city, not a forecast for the event date	The plan describes a snapshot logged over time
-Weather	Refresh returns 400 if the event has no city and 404 if the city canít be found, as well as the planned 404 (event missing) and 502 (service unavailable)	The weather lookup depends on the eventís city
+Weather	The refresh stores the current conditions at the event‚Äôs city, not a forecast for the event date	The plan describes a snapshot logged over time
+Weather	Refresh returns 400 if the event has no city and 404 if the city can‚Äôt be found, as well as the planned 404 (event missing) and 502 (service unavailable)	The weather lookup depends on the event‚Äôs city
+
+# RaceDay ‚Äì Part 3: MVC Web Application
+
+[![CI](https://github.com/<your-username>/<your-repo>/actions/workflows/<workflow-file>.yml/badge.svg?branch=part3)](https://github.com/<your-username>/<your-repo>/actions)
+
+**Demo video (unlisted YouTube):** <PASTE YOUTUBE LINK HERE>
+
+## Architecture
+```
+Browser ‚Üí RaceDay.Web (ASP.NET Core MVC, Docker) ‚Üí RaceDay.API (Web API, JWT) ‚Üí SQL Server
+                                                         ‚îî‚Üí Azure Blob Storage (banners, profile pictures)
+```
+- The MVC app has **no database access and no business logic**. Every read and write goes through the API.
+- Login and register call the API. The JWT and the role are kept in the MVC **session**, and a `SessionAuthorize` filter protects pages by role.
+- Images are uploaded **to the API**, which stores them in Azure Blob Storage. The MVC app never talks to Azure.
+
+## Run locally
+1. Start the API (`RaceDay.API`, http profile). It needs SQL Server and `appsettings.Development.json` containing `AzureBlob:ConnectionString` and `AzureBlob:ContainerName` (not committed).
+2. Set `Api:BaseUrl` in `RaceDay.Web/appsettings.json` to the API URL.
+3. Run `RaceDay.Web` in Visual Studio.
+
+## Run with Docker (the MVC app)
+```bash
+docker build -t raceday-web ./RaceDay.Web
+docker run -d --name raceday-web -p 8080:8080 -e Api__BaseUrl=http://host.docker.internal:<API-HTTP-PORT>/ raceday-web
+```
+Then browse to http://localhost:8080. The API must be running on your machine.
+
+## Roles
+| Role | Can do |
+|---|---|
+| Organiser | Dashboard, create/edit/delete events with banner, categories, view enrolments, enter and publish results |
+| Participant | Browse and filter events, enrol, pay, cancel, see My Results, edit profile and picture |
+
+## Status colours
+Confirmed (Active and Paid) is green. Pending (Active, not yet paid) is amber. Cancelled is red. Refunded is grey.
+
+## Design decisions and deviations
+- Event distance is stored on **categories** in the API and ERD, so the web shows an event's distances from its categories.
+- Added `GET /api/events/mine` so the dashboard can show an organiser's past events and enrolment counts.
+- API enrolment and payment status are combined into the Confirmed/Pending labels shown in the UI.
+- Added upload endpoints `POST /api/events/{id}/banner` and `POST /api/users/me/picture`, backed by Azure Blob Storage.
+
+## CI/CD
+GitHub Actions builds the API, builds the MVC app, and builds the Docker image on every push to `main` and `part3`.
