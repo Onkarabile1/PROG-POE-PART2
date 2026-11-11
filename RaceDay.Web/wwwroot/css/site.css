@@ -241,4 +241,28 @@ a {
     background: #e3e6ea;
     color: #444;
 }
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #1d2733;
+    background: var(--rd-light);
+}
+
+h1, h2, h3, .navbar-brand, .rd-page-title {
+    font-family: 'Barlow Condensed', 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.card {
+    border-radius: .75rem;
+}
+
+.btn-primary {
+    font-weight: 600;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--rd-orange);
+    box-shadow: 0 0 0 .2rem rgba(255,107,26,.2);
+}
     }
