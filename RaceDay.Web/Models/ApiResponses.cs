@@ -38,6 +38,8 @@ public class EventResponse
         Categories is { Count: > 0 }
             ? string.Join(" / ", Categories.Select(c => c.DistanceKm).Distinct().OrderBy(d => d).Select(d => $"{d:0.##} km"))
             : "No categories yet";
+
+    public string BannerUrl { get; internal set; }
 }
 
 public class EnrolmentResponse

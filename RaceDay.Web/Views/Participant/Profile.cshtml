@@ -17,7 +17,10 @@
 
                 <div class="rd-avatar rd-avatar-placeholder mx-auto mb-3">@(Model.Fields.Values.FirstOrDefault(v => !string.IsNullOrEmpty(v))?[..1].ToUpper())</div>
             }
-            @* PICTURE-UPLOAD-FORM (added in Step 4) *@
+            <form asp-action="UploadPicture" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" class="form-control form-control-sm mb-2" accept=".jpg,.jpeg,.png,.webp" />
+                <button class="btn btn-outline-primary btn-sm" type="submit">Upload picture</button>
+            </form>
         </div>
     </div>
     <div class="col-md-8">

@@ -7,26 +7,30 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 
-// Session: this is where the logged-in user and their role are remembered.
+// Session keeps the JWT and role between requests
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(8);
-    options.Cookie.Name = ".RaceDay.Session";
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
-// All data comes from the Part 2 API. The address is configurable so Docker can override it later.
 var apiBaseUrl = builder.Configuration["Api:BaseUrl"]
     ?? throw new InvalidOperationException("Api:BaseUrl is not configured.");
 
 builder.Services.AddHttpClient<IRaceDayApi, RaceDayApi>(client =>
 {
-    client.BaseAddress = new Uri(apiBaseUrl.TrimEnd('/') + "/");
+    client.BaseAddress = new Uri(apiBaseUrl);
     client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+builder.Services.AddHttpClient<IRaceDayUploads, RaceDayUploads>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(60);
 });
 
 var app = builder.Build();
@@ -34,13 +38,17 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+}
+app.UseStatusCodePagesWithReExecute("/Home/Error");
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-// One fixed culture, so numbers and dates are read and shown the same way on every machine and in Docker.
+// One fixed culture so decimals and dates behave the same locally and in Docker
 var culture = new CultureInfo("en-US");
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
@@ -49,25 +57,19 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedUICultures = new[] { culture }
 });
 
-// Stop browsers caching pages, so the Back button cannot show a protected page after logging out.
-app.Use(async (context, next) =>
-{
-    context.Response.Headers.CacheControl = "no-store";
-    await next();
-});
-
 app.UseRouting();
 app.UseSession();
-app.UseAuthorization();
+
+// Stops the Back button showing protected pages after logout
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Cache-Control"] = "no-store, no-cache";
+    context.Response.Headers["Pragma"] = "no-cache";
+    await next();
+});
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-
-builder.Services.AddHttpClient<IRaceDayUploads, RaceDayUploads>(c =>
-{
-    c.BaseAddress = new Uri(builder.Configuration["Api:BaseUrl"]!);
-    c.Timeout = TimeSpan.FromSeconds(60);
-});

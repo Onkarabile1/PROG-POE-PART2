@@ -1,0 +1,30 @@
+﻿@{
+    string? Message(params string[] keys)
+    {
+        foreach (var key in keys)
+        {
+            if (TempData[key] is string text && !string.IsNullOrWhiteSpace(text))
+                return text;
+        }
+        return null;
+    }
+
+    var success = Message("Success", "SuccessMessage", "success");
+    var error = Message("Error", "ErrorMessage", "error");
+}
+
+@if (success is not null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @success
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (error is not null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @error
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}

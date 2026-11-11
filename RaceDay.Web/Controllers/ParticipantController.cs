@@ -178,4 +178,16 @@ public class ParticipantController : AppController
         }
         return e;
     }
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> UploadPicture(IFormFile? file, [FromServices] IRaceDayUploads uploads)
+    {
+        if (file is null || file.Length == 0)
+        {
+            ShowError("Please choose an image first.");
+            return RedirectToAction(nameof(Profile));
+        }
+        var up = await uploads.UploadAsync("api/users/me/picture", file);
+        if (up.Success) ShowSuccess("Profile picture updated."); else ShowError(up.Error ?? "Upload failed.");
+        return RedirectToAction(nameof(Profile));
+    }
 }
