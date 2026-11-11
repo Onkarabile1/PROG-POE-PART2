@@ -1,0 +1,25 @@
+﻿# ---------- build stage ----------
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Restore first so this layer is cached until the .csproj changes
+COPY RaceDay.Web.csproj ./
+RUN dotnet restore
+
+COPY . .
+RUN dotnet publish RaceDay.Web.csproj -c Release -o /app/publish --no-restore
+
+# ---------- runtime stage ----------
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+ENV ASPNETCORE_URLS=http://+:8080 \
+    ASPNETCORE_ENVIRONMENT=Production \
+    Api__BaseUrl=http://host.docker.internal:5000/
+
+EXPOSE 8080
+COPY --from=build /app/publish .
+
+# Run as the non-root user built into the .NET 8 images
+USER $APP_UID
+ENTRYPOINT ["dotnet", "RaceDay.Web.dll"]

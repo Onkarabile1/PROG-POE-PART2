@@ -43,7 +43,10 @@ app.UseStatusCodePagesWithReExecute("/Home/Error");
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseHttpsRedirection();
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseHttpsRedirection();
+    }
 }
 
 app.UseStaticFiles();
